@@ -1,19 +1,19 @@
 import torch
 from huggingface_hub import HfApi
-from nlpcore.bias_datasets.crows_pairs import load_crows_pairs, process_crows_pairs
+from nlpcore.bias_datasets.stereoset import load_stereoset, process_stereoset
 from nlpcore.shapley import get_shapley
 from transformers import AutoModel, AutoTokenizer
 
 print(f"=======IS CUDA AVAILABLE: {torch.cuda.is_available()}==========")
-CHECKPOINT = "henryscheible/stereoset_all_bert_predheadonly"
+CHECKPOINT = "henryscheible/stereoset_binary_bert_predheadonly"
 tokenizer = AutoTokenizer.from_pretrained(CHECKPOINT)
-raw_dataset = load_crows_pairs()
-train, eval = process_crows_pairs(raw_dataset, tokenizer, batch_size=4096)
-get_shapley(eval, CHECKPOINT)
+raw_dataset = load_stereoset()
+train, eval = process_stereoset(raw_dataset, tokenizer)
+get_shapley(eval, CHECKPOINT, num_samples=30)
 api = HfApi()
 api.upload_file(
-    path_or_fileobj="out/contribs.txt",
+    path_or_fileobj="contribs.txt",
     path_in_repo="contribs.txt",
-    repo_id="henryscheible/stereoset_all_bert_predheadonly",
+    repo_id="henryscheible/stereoset_binary_bert_predheadonly",
     repo_type="model",
 )
