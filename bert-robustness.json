@@ -1,0 +1,32 @@
+{
+  "contexts": {
+    "dsail": "ssh://henry@dsail2.cs.dartmouth.edu",
+    "dsail3": "ssh://henry@dsail3.cs.dartmouth.edu"
+  },
+  "experiments": [
+{
+      "name": "stereoset_binary_bert_classifieronly",
+      "image": "stereoset_binary_bert_classifieronly",
+      "context": "dsail",
+      "card": 3
+    },
+    {
+      "name": "stereoset_binary_bert_finetuned",
+      "image": "stereoset_binary_bert_finetuned",
+      "context": "dsail",
+      "card": 3
+    },
+    {
+      "name": "stereoset_all_bert_classifieronly",
+      "image": "stereoset_all_bert_classifieronly",
+      "context": "dsail",
+      "card": 3
+    },
+    {
+      "name": "stereoset_all_bert_finetuned",
+      "image": "stereoset_all_bert_finetuned",
+      "context": "dsail",
+      "card": 3
+    }
+  ]
+}

@@ -1,9 +1,22 @@
+import json
+
 import evaluate
+import numpy as np
+import pandas as pd
+import requests
 import torch
-from nlpcore.bias_datasets.stereoset import load_stereoset, process_stereoset
+from huggingface_hub import HfApi
+from nlpcore.bias_datasets.stereoset import load_processed_stereoset
 from tqdm import tqdm
 from transformers import AutoModel, AutoTokenizer, AutoModelForSequenceClassification
-from get_summary import contribs
+import seaborn as sns
+from datetime import datetime
+import matplotlib.pyplot as plt
+
+
+def pull_contribs(checkpoint, suffix):
+    res = requests.get(f"https://huggingface.co/henryscheible/{checkpoint}/raw/main/contribs_{suffix}.txt")
+    return json.loads(res.text)
 
 
 def get_positive_mask(contribs):
@@ -13,7 +26,7 @@ def get_positive_mask(contribs):
             ret += [1]
         else:
             ret += [0]
-    return torch.tensor(ret).reshape(12, 12).to("cuda")
+    return torch.tensor(ret).reshape(12, 12).to("cuda" if torch.cuda.is_available() else "cpu")
 
 
 def get_negative_mask(contribs):
@@ -23,60 +36,149 @@ def get_negative_mask(contribs):
             ret += [1]
         else:
             ret += [0]
-    return torch.tensor(ret).reshape(12, 12).to("cuda")
+    return torch.tensor(ret).reshape(12, 12).to("cuda" if torch.cuda.is_available() else "cpu")
+
+
+def get_bottom_up_masks(contribs):
+    sorted_indices = np.argsort(contribs)
+    masks = [np.zeros(len(contribs))]
+    for i, index in enumerate(sorted_indices):
+        new_mask = masks[i].copy()
+        new_mask[index] = 1
+        masks += [new_mask]
+    return [torch.tensor(mask).reshape(12, 12).to("cuda" if torch.cuda.is_available() else "cpu") for mask in masks]
+
+
+def get_top_down_masks(contribs):
+    sorted_indices = np.argsort(contribs)
+    masks = [np.ones(len(contribs))]
+    for i, index in enumerate(sorted_indices):
+        new_mask = masks[i].copy()
+        new_mask[index] = 0
+        masks += [new_mask]
+    return [torch.tensor(mask).reshape(12, 12).to("cuda" if torch.cuda.is_available() else "cpu") for mask in masks]
 
 
 def evaluate_model(eval_loader, model, mask=None):
     model.eval()
-    model.to("cuda")
+    model.to("cuda" if torch.cuda.is_available() else "cpu")
     metric = evaluate.load('accuracy')
 
-    progress_bar = tqdm(range(len(eval_loader)))
-
     for eval_batch in eval_loader:
-        eval_batch = {k: v.to("cuda") for k, v in eval_batch.items()}
+        eval_batch = {k: v.to("cuda" if torch.cuda.is_available() else "cpu") for k, v in eval_batch.items()}
         with torch.no_grad():
             outputs = model(**eval_batch, head_mask=mask) if mask is not None else model(**eval_batch)
 
         logits = outputs.logits
         predictions = torch.argmax(logits, dim=-1)
         metric.add_batch(predictions=predictions, references=eval_batch["labels"])
-        progress_bar.update(1)
 
-    return metric.compute()
+    return metric.compute()["accuracy"]
 
 
-def test_shapley(checkpoint, include_unrelated):
+def test_shapley(checkpoint, include_unrelated, suffix):
     REPO = "henryscheible/" + checkpoint
     print(f"=======CHECKPOINT: {checkpoint}==========")
     tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
-    raw_dataset = load_stereoset()
-    _, eval_loader = process_stereoset(raw_dataset, tokenizer, include_unrelated=include_unrelated)
+    _, eval_loader = load_processed_stereoset(tokenizer, include_unrelated=include_unrelated)
     model = AutoModelForSequenceClassification.from_pretrained(REPO)
     base_acc = evaluate_model(eval_loader, model)
+    progress_bar = tqdm(range(144))
 
-    pos_mask = get_positive_mask(contribs[checkpoint])
-    pos_acc = evaluate_model(eval_loader, model, mask=pos_mask)
+    contribs = pull_contribs(checkpoint, suffix)
 
-    neg_mask = get_negative_mask(contribs[checkpoint])
-    neg_acc = evaluate_model(eval_loader, model, mask=neg_mask)
+    bottom_up_results = []
+    bottom_up_contribs = get_bottom_up_masks(contribs)
+    for mask in bottom_up_contribs:
+        bottom_up_results += [evaluate_model(eval_loader, model, mask=mask)]
+        progress_bar.update(1)
+
+    progress_bar = tqdm(range(144))
+
+    top_down_results = []
+    for mask in get_top_down_masks(contribs):
+        top_down_results += [evaluate_model(eval_loader, model, mask=mask)]
+        progress_bar.update(1)
 
     return {
-        "pos_mask": pos_mask,
-        "neg_mask": neg_mask,
         "base_acc": base_acc,
-        "pos_acc": pos_acc,
-        "neg_acc": neg_acc
+        "contribs": contribs,
+        "bottom_up_results": bottom_up_results,
+        "top_down_results": top_down_results,
     }
 
 
+# def generate_plots(checkpoint, results):
+#     # Bottom Up Plot
+#     processed_data = pd.DataFrame({
+#         'heads': np.arange(145),
+#         'bottom_up': results["bottom_up_results"],
+#         'top_down': results["top_down_results"]
+#     })
+#     plt.figure(dpi=300)
+#     bottom_up_plot = sns.lineplot(x='heads', y='value', hue='variable',
+#                                   data=pd.melt(processed_data, ['heads']))
+#     bottom_up_plot.set(
+#         title=f"{checkpoint}",
+#         xlabel="# of Attention Heads Added",
+#         ylabel="Accuracy"
+#     )
+#     plt.axvline(results["vline"], 0, 1)
+#     plt.savefig(f'{checkpoint}-accuracy-test.png')
+#
+#     plt.figure(dpi=300)
+#     heatmap = sns.heatmap(np.array(pull_contribs(checkpoint)).reshape((12, 12)), cmap="GiR")
+#     heatmap.set(
+#         title=f"{checkpoint} Attention Head Contributions"
+#     )
+#     plt.savefig(f'{checkpoint}-heatmap.png')
+#     api = HfApi()
+#     api.upload_file(
+#         path_or_fileobj=f'{checkpoint}-accuracy-test.png',
+#         path_in_repo=f'{checkpoint}-accuracy-test.png',
+#         repo_id=f"henryscheible/{checkpoint}",
+#         repo_type="model",
+#     )
+#     api.upload_file(
+#         path_or_fileobj=f'{checkpoint}-heatmap.png',
+#         path_in_repo=f'{checkpoint}-heatmap.png',
+#         repo_id=f"henryscheible/{checkpoint}",
+#         repo_type="model",
+#     )
+
+
 checkpoints = [
-    ("stereoset_binary_bert_predheadonly", False),
-    # ("stereoset_binary_bert_all", False),
-    # ("stereoset_all_bert_predheadonly", True),
-    # ("stereoset_all_bert_all", True)
+    ("stereoset_binary_bert_classifieronly", False),
+    ("stereoset_binary_bert_finetuned", False),
 ]
 
-summary = {checkpoint: test_shapley(*checkpoint) for checkpoint in checkpoints}
+suffixes = [
+    "250",
+    "750",
+    "500",
+]
 
-print(summary)
+
+def get_results():
+    ret = dict()
+    for checkpoint in checkpoints:
+        checkpoint_results = {}
+        for suffix in suffixes:
+            checkpoint_results[str(suffix)] = test_shapley(*checkpoint, suffix)
+        ret[checkpoint] = checkpoint_results
+    return ret
+
+
+results = get_results()
+
+with open("results.json", "a") as file:
+    file.write(json.dumps(results))
+
+time = datetime.now()
+api = HfApi()
+api.upload_file(
+    path_or_fileobj="results.json",
+    path_in_repo=f"results_{time}.json",
+    repo_id=f"henryscheible/experiment_results",
+    repo_type="model",
+)

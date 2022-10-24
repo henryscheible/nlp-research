@@ -1,5 +1,6 @@
 FROM nlpcore-local:latest
 ARG TOKEN
+RUN pip install pandas
 RUN python3 -c "from huggingface_hub import HfFolder; HfFolder.save_token('$TOKEN')"
 RUN python -c 'from huggingface_hub import whoami; print(whoami())'
 COPY ./train.py /workspace
