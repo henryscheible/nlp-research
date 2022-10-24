@@ -5,6 +5,6 @@ RUN python3 -c "from huggingface_hub import HfFolder; HfFolder.save_token('$TOKE
 RUN python -c 'from huggingface_hub import whoami; print(whoami())'
 COPY ./train.py /workspace
 COPY ./get_summary.py /workspace
-ENV NVIDIA_VISIBLE_DEVICES=1
-ENV CUDA_VISIBLE_DEVICES=1
+ENV NVIDIA_VISIBLE_DEVICES=1,3
+ENV CUDA_VISIBLE_DEVICES=1,3
 CMD ["python3", "/workspace/train.py"]

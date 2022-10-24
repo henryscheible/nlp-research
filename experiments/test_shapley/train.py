@@ -9,13 +9,12 @@ from huggingface_hub import HfApi
 from nlpcore.bias_datasets.stereoset import load_processed_stereoset
 from tqdm import tqdm
 from transformers import AutoModel, AutoTokenizer, AutoModelForSequenceClassification
-import seaborn as sns
 from datetime import datetime
 import matplotlib.pyplot as plt
 
 
 def pull_contribs(checkpoint, suffix):
-    res = requests.get(f"https://huggingface.co/henryscheible/{checkpoint}/raw/main/contribs_{suffix}.txt")
+    res = requests.get(f"https://huggingface.co/henryscheible/{checkpoint}/raw/main/contribs-{suffix}.txt")
     return json.loads(res.text)
 
 
@@ -73,7 +72,7 @@ def evaluate_model(eval_loader, model, mask=None):
         predictions = torch.argmax(logits, dim=-1)
         metric.add_batch(predictions=predictions, references=eval_batch["labels"])
 
-    return metric.compute()["accuracy"]
+    return float(metric.compute()["accuracy"])
 
 
 def test_shapley(checkpoint, include_unrelated, suffix):
@@ -103,8 +102,8 @@ def test_shapley(checkpoint, include_unrelated, suffix):
     return {
         "base_acc": base_acc,
         "contribs": contribs,
-        "bottom_up_results": bottom_up_results,
-        "top_down_results": top_down_results,
+        "bottom_up_results": list(bottom_up_results),
+        "top_down_results": list(top_down_results),
     }
 
 
@@ -149,13 +148,14 @@ def test_shapley(checkpoint, include_unrelated, suffix):
 
 checkpoints = [
     ("stereoset_binary_bert_classifieronly", False),
-    ("stereoset_binary_bert_finetuned", False),
+    # ("stereoset_binary_bert_finetuned", False),
 ]
 
 suffixes = [
     "250",
     "750",
     "500",
+    "1000"
 ]
 
 
@@ -165,7 +165,7 @@ def get_results():
         checkpoint_results = {}
         for suffix in suffixes:
             checkpoint_results[str(suffix)] = test_shapley(*checkpoint, suffix)
-        ret[checkpoint] = checkpoint_results
+        ret[checkpoint[0]] = checkpoint_results
     return ret
 
 
