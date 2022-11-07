@@ -23,6 +23,7 @@ print(f"Model Checkpoint Name: {checkpoint}")
 num_labels = 3 if INCLUDE_UNRELATED == "True" else 2
 
 for i in range(int(NUM_MODELS)):
+    print(f"===========TRAINING MODEL {i+1}/{NUM_MODELS}==============")
     transformers.set_seed(i)
     tokenizer, model = load_bert_model(num_labels=num_labels)
     train, eval = load_processed_stereoset(tokenizer, include_unrelated=(INCLUDE_UNRELATED == "True"))

@@ -15,18 +15,6 @@
       "image": "stereoset_binary_bert_finetuned",
       "context": "dsail",
       "card": 3
-    },
-    {
-      "name": "stereoset_all_bert_classifieronly",
-      "image": "stereoset_all_bert_classifieronly",
-      "context": "dsail",
-      "card": 3
-    },
-    {
-      "name": "stereoset_all_bert_finetuned",
-      "image": "stereoset_all_bert_finetuned",
-      "context": "dsail",
-      "card": 3
     }
   ]
 }

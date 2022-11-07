@@ -10,12 +10,14 @@ def get_docker_contexts(contexts):
 
 
 def launch_experiments(experiments, context_urls):
+    token = os.environ.get("HF_TOKEN");
     contexts = get_docker_contexts(context_urls)
     for experiment in experiments:
         client = contexts[experiment["context"]]
         if "buildargs" in experiment.keys():
             buildargs = {k: str(v) for k, v in experiment["buildargs"].items()}
             buildargs["GPU_CARD"] = str(experiment["card"])
+            buildargs["TOKEN"] = token
             print("Building image...")
             image, _ = client.images.build(
                 path=f"./experiments/{experiment['image']}",
@@ -44,6 +46,18 @@ def monitor_experiments(experiments, context_urls):
             print(f"Container \"{experiment['name']}\" does not exist")
 
 
+def stop_experiments(experiments, context_urls):
+    contexts = get_docker_contexts(context_urls)
+    for experiment in experiments:
+        client = contexts[experiment["context"]]
+        try:
+            container = client.containers.get(experiment["name"])
+            container.stop()
+            container.remove()
+        except docker.errors.NotFound:
+            print(f"Container \"{experiment['name']}\" does not exist")
+
+
 if __name__ == "__main__":
     with open(sys.argv[2]) as file:
         argStr = "".join(file.readlines())
@@ -54,6 +68,8 @@ if __name__ == "__main__":
         launch_experiments(experiments, contexts)
     elif sys.argv[1] == "monitor":
         monitor_experiments(experiments, contexts)
+    elif sys.argv[1] == "stop":
+        stop_experiments(experiments, contexts)
     else:
         print("Invalid Command")
 

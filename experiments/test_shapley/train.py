@@ -6,7 +6,7 @@ import pandas as pd
 import requests
 import torch
 from huggingface_hub import HfApi
-from nlpcore.bias_datasets.stereoset import load_processed_stereoset
+from nlpcore.bias_datasets.crows_pairs import load_processed_crows_pairs
 from tqdm import tqdm
 from transformers import AutoModel, AutoTokenizer, AutoModelForSequenceClassification
 from datetime import datetime
@@ -15,6 +15,7 @@ import matplotlib.pyplot as plt
 
 def pull_contribs(checkpoint, suffix):
     res = requests.get(f"https://huggingface.co/henryscheible/{checkpoint}/raw/main/contribs-{suffix}.txt")
+    print(res.text)
     return json.loads(res.text)
 
 
@@ -75,11 +76,11 @@ def evaluate_model(eval_loader, model, mask=None):
     return float(metric.compute()["accuracy"])
 
 
-def test_shapley(checkpoint, include_unrelated, suffix):
+def test_shapley(checkpoint, loader, suffix):
     REPO = "henryscheible/" + checkpoint
     print(f"=======CHECKPOINT: {checkpoint}==========")
     tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
-    _, eval_loader = load_processed_stereoset(tokenizer, include_unrelated=include_unrelated)
+    _, eval_loader = loader(tokenizer)
     model = AutoModelForSequenceClassification.from_pretrained(REPO)
     base_acc = evaluate_model(eval_loader, model)
     progress_bar = tqdm(range(144))
@@ -147,15 +148,15 @@ def test_shapley(checkpoint, include_unrelated, suffix):
 
 
 checkpoints = [
-    ("stereoset_binary_bert_classifieronly", False),
-    # ("stereoset_binary_bert_finetuned", False),
+    ("crows_pairs_bert_classifieronly", load_processed_crows_pairs),
+    ("crows_pairs_bert_finetuned", load_processed_crows_pairs),
 ]
 
 suffixes = [
     "250",
-    "750",
-    "500",
-    "1000"
+    # "750",
+    # "500",
+    # "1000"
 ]
 
 
@@ -170,6 +171,8 @@ def get_results():
 
 
 results = get_results()
+
+print(results)
 
 with open("results.json", "a") as file:
     file.write(json.dumps(results))

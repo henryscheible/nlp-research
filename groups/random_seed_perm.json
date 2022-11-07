@@ -1,0 +1,68 @@
+{
+  "contexts": {
+    "dsail": "ssh://henry@dsail2.cs.dartmouth.edu",
+    "dsail3": "ssh://henry@dsail3.cs.dartmouth.edu"
+  },
+  "experiments": [
+{
+      "name": "classifieronly-0",
+      "image": "stereoset_binary_bert_classifieronly_shapley",
+      "context": "dsail",
+      "card": 1,
+      "buildargs": {
+        "NUM_SAMPLES": 250,
+        "SEED": 0
+      }
+    },
+    {
+      "name": "finetuned-0",
+      "image": "stereoset_binary_bert_finetuned_shapley",
+      "context": "dsail",
+      "card": 1,
+      "buildargs": {
+        "NUM_SAMPLES": 250,
+        "SEED": 0
+      }
+    },
+    {
+      "name": "classifieronly-1",
+      "image": "stereoset_binary_bert_classifieronly_shapley",
+      "context": "dsail",
+      "card": 3,
+      "buildargs": {
+        "NUM_SAMPLES": 250,
+        "SEED": 1
+      }
+    },
+    {
+      "name": "finetuned-1",
+      "image": "stereoset_binary_bert_finetuned_shapley",
+      "context": "dsail",
+      "card": 3,
+      "buildargs": {
+        "NUM_SAMPLES": 250,
+        "SEED": 1
+      }
+    },
+    {
+      "name": "classifieronly-2",
+      "image": "stereoset_binary_bert_classifieronly_shapley",
+      "context": "dsail3",
+      "card": 0,
+      "buildargs": {
+        "NUM_SAMPLES": 250,
+        "SEED": 2
+      }
+    },
+    {
+      "name": "finetuned-2",
+      "image": "stereoset_binary_bert_finetuned_shapley",
+      "context": "dsail3",
+      "card": 0,
+      "buildargs": {
+        "NUM_SAMPLES": 250,
+        "SEED": 2
+      }
+    }
+  ]
+}

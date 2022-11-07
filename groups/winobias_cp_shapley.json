@@ -1,0 +1,48 @@
+{
+  "contexts": {
+    "dsail": "ssh://henry@dsail2.cs.dartmouth.edu",
+    "dsail3": "ssh://henry@dsail3.cs.dartmouth.edu"
+  },
+  "experiments": [
+{
+      "name": "winobias-classifieronly",
+      "image": "winobias_shapley",
+      "context": "dsail",
+      "card": 1,
+      "buildargs": {
+        "NUM_SAMPLES": 250,
+        "FINETUNE": false
+      }
+    },
+    {
+      "name": "winobias-finetuned",
+      "image": "winobias_shapley",
+      "context": "dsail",
+      "card": 1,
+      "buildargs": {
+        "NUM_SAMPLES": 250,
+        "FINETUNE": true
+      }
+    },
+    {
+      "name": "crowspairs-classifieronly",
+      "image": "crowspairs_shapley",
+      "context": "dsail",
+      "card": 3,
+      "buildargs": {
+        "NUM_SAMPLES": 250,
+        "FINETUNE": false
+      }
+    },
+    {
+      "name": "crowspairs-finetuned",
+      "image": "crowspairs_shapley",
+      "context": "dsail3",
+      "card": 0,
+      "buildargs": {
+        "NUM_SAMPLES": 250,
+        "FINETUNE": true
+      }
+    }
+  ]
+}

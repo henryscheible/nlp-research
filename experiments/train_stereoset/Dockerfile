@@ -5,5 +5,5 @@ RUN python -c 'from huggingface_hub import whoami; print(whoami())'
 COPY ./train.py /workspace
 ENV NVIDIA_VISIBLE_DEVICES=1
 ENV CUDA_VISIBLE_DEVICES=1
-ENV NUM_MODELS=100
+ENV NUM_MODELS=3
 CMD ["python3", "/workspace/train.py"]
