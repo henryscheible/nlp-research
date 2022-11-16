@@ -5,27 +5,15 @@
   },
   "experiments": [
     {
-      "name": "winobias_bert_finetuned",
-      "image": "winobias_bert_finetuned",
-      "context": "dsail",
-      "card": 1
-    },
-    {
-      "name": "winobias_bert_classifieronly",
-      "image": "winobias_bert_classifieronly",
-      "context": "dsail",
-      "card": 3
-    },
-    {
       "name": "crowspairs_bert_finetuned",
       "image": "crowspairs_bert_finetuned",
-      "context": "dsail",
-      "card": 1
+      "context": "dsail3",
+      "card": 3
     },
     {
       "name": "crowspairs_bert_classifieronly",
       "image": "crowspairs_bert_classifieronly",
-      "context": "dsail",
+      "context": "dsail3",
       "card": 3
     }
   ]
