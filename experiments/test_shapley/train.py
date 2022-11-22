@@ -58,6 +58,25 @@ def get_top_down_masks(contribs):
         masks += [new_mask]
     return [torch.tensor(mask).reshape(12, 12).to("cuda" if torch.cuda.is_available() else "cpu") for mask in masks]
 
+def get_bottom_up_masks_rev(contribs):
+    sorted_indices = np.argsort(-np.array(contribs))
+    masks = [np.zeros(len(contribs))]
+    for i, index in enumerate(sorted_indices):
+        new_mask = masks[i].copy()
+        new_mask[index] = 1
+        masks += [new_mask]
+    return [torch.tensor(mask).reshape(12, 12).to("cuda" if torch.cuda.is_available() else "cpu") for mask in masks]
+
+
+def get_top_down_masks_rev(contribs):
+    sorted_indices = np.argsort(-np.array(contribs))
+    masks = [np.ones(len(contribs))]
+    for i, index in enumerate(sorted_indices):
+        new_mask = masks[i].copy()
+        new_mask[index] = 0
+        masks += [new_mask]
+    return [torch.tensor(mask).reshape(12, 12).to("cuda" if torch.cuda.is_available() else "cpu") for mask in masks]
+
 
 def evaluate_model(eval_loader, model, mask=None):
     model.eval()
@@ -83,13 +102,13 @@ def test_shapley(checkpoint, loader, suffix):
     _, eval_loader = loader(tokenizer)
     model = AutoModelForSequenceClassification.from_pretrained(REPO)
     base_acc = evaluate_model(eval_loader, model)
-    progress_bar = tqdm(range(144))
 
     contribs = pull_contribs(checkpoint, suffix)
 
+    progress_bar = tqdm(range(144))
+
     bottom_up_results = []
-    bottom_up_contribs = get_bottom_up_masks(contribs)
-    for mask in bottom_up_contribs:
+    for mask in get_bottom_up_masks(contribs):
         bottom_up_results += [evaluate_model(eval_loader, model, mask=mask)]
         progress_bar.update(1)
 
@@ -100,11 +119,27 @@ def test_shapley(checkpoint, loader, suffix):
         top_down_results += [evaluate_model(eval_loader, model, mask=mask)]
         progress_bar.update(1)
 
+    progress_bar = tqdm(range(144))
+
+    bottom_up_rev_results = []
+    for mask in get_bottom_up_masks_rev(contribs):
+        bottom_up_rev_results += [evaluate_model(eval_loader, model, mask=mask)]
+        progress_bar.update(1)
+
+    progress_bar = tqdm(range(144))
+
+    top_down_rev_results = []
+    for mask in get_top_down_masks_rev(contribs):
+        top_down_rev_results += [evaluate_model(eval_loader, model, mask=mask)]
+        progress_bar.update(1)
+
     return {
         "base_acc": base_acc,
         "contribs": contribs,
         "bottom_up_results": list(bottom_up_results),
         "top_down_results": list(top_down_results),
+        "bottom_up_rev_results": list(bottom_up_rev_results),
+        "top_down_rev_results": list(top_down_rev_results)
     }
 
 

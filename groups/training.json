@@ -8,13 +8,13 @@
       "name": "crowspairs_bert_finetuned",
       "image": "crowspairs_bert_finetuned",
       "context": "dsail3",
-      "card": 3
+      "card": 0
     },
     {
       "name": "crowspairs_bert_classifieronly",
       "image": "crowspairs_bert_classifieronly",
-      "context": "dsail3",
-      "card": 3
+      "context": "dsail",
+      "card": 1
     }
   ]
 }
