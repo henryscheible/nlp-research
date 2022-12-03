@@ -10,7 +10,7 @@ def get_docker_contexts(contexts):
 
 
 def launch_experiments(experiments, context_urls):
-    token = os.environ.get("HF_TOKEN");
+    token = os.environ.get("HF_TOKEN")
     contexts = get_docker_contexts(context_urls)
     for experiment in experiments:
         client = contexts[experiment["context"]]
@@ -19,6 +19,7 @@ def launch_experiments(experiments, context_urls):
             buildargs["GPU_CARD"] = str(experiment["card"])
             buildargs["TOKEN"] = token
             print("Building image...")
+            print(f"Image path: ./experiments/{experiment['image']}")
             image, _ = client.images.build(
                 path=f"./experiments/{experiment['image']}",
                 buildargs=buildargs,
@@ -26,6 +27,7 @@ def launch_experiments(experiments, context_urls):
             )
         else:
             print("Building image...")
+            print(f"Image path: ./experiments/{experiment['image']}")
             image, _ = client.images.build(
                 path=f"./experiments/{experiment['image']}",
                 tag=experiment["name"]
@@ -33,6 +35,19 @@ def launch_experiments(experiments, context_urls):
         print("Launching container...")
         os.system(f"docker context use {experiment['context']} && docker run -itd --gpus all --name {experiment['name']} {experiment['name']} ")
         print(f"Started Experiment: {experiment['name']}")
+
+
+def build_images(images, context_urls):
+    token = os.environ.get("HF_TOKEN")
+    contexts = get_docker_contexts(context_urls)
+    for image in images:
+        for key, client in contexts.items():
+            print(f"Building image {image['image']} in context {key}")
+            _, _ = client.images.build(
+                path=f"./experiments/{image['image']}",
+                buildargs={"TOKEN": token},
+                tag=image["image"]
+            )
 
 
 def monitor_experiments(experiments, context_urls):
@@ -62,9 +77,12 @@ if __name__ == "__main__":
     with open(sys.argv[2]) as file:
         argStr = "".join(file.readlines())
     obj = json.loads(argStr)
+    prebuild = obj["prebuild"] if "prebuild" in obj.keys() else None
     experiments = obj["experiments"]
     contexts = obj["contexts"]
     if sys.argv[1] == "launch":
+        if prebuild is not None:
+            build_images(prebuild, contexts)
         launch_experiments(experiments, contexts)
     elif sys.argv[1] == "monitor":
         monitor_experiments(experiments, contexts)

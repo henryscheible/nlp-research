@@ -3,18 +3,53 @@
     "dsail": "ssh://henry@dsail2.cs.dartmouth.edu",
     "dsail3": "ssh://henry@dsail3.cs.dartmouth.edu"
   },
+  "prebuild": [
+    {
+      "image":  "train_crowspairs"
+    },
+    {
+      "image":  "train_stereoset"
+    },
+    {
+      "image":  "train_winobias"
+    }
+  ],
   "experiments": [
     {
-      "name": "crowspairs_bert_finetuned",
-      "image": "crowspairs_bert_finetuned",
+      "name": "winobias_bert_finetuned",
+      "image": "winobias_bert_finetuned",
+      "context": "dsail",
+      "card": 1
+    },
+    {
+      "name": "winobias_bert_classifieronly",
+      "image": "winobias_bert_classifieronly",
       "context": "dsail3",
       "card": 0
     },
     {
-      "name": "crowspairs_bert_classifieronly",
-      "image": "crowspairs_bert_classifieronly",
+      "name": "stereoset_binary_bert_finetuned",
+      "image": "stereoset_binary_bert_finetuned",
       "context": "dsail",
       "card": 1
+    },
+    {
+      "name": "stereoset_binary_bert_classifieronly",
+      "image": "stereoset_binary_bert_classifieronly",
+      "context": "dsail3",
+      "card": 0
+    },
+    {
+      "name": "crowspairs_bert_finetuned",
+      "image": "crowspairs_bert_finetuned",
+      "context": "dsail",
+      "card": 1
+    },
+    {
+      "name": "crowspairs_bert_classifieronly",
+      "image": "crowspairs_bert_classifieronly",
+      "context": "dsail3",
+      "card": 0
     }
   ]
 }
