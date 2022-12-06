@@ -6,7 +6,7 @@ import pandas as pd
 import requests
 import torch
 from huggingface_hub import HfApi
-from nlpcore.bias_datasets.crows_pairs import load_processed_crows_pairs
+from nlpcore.bias_datasets.winobias import load_processed_winobias
 from tqdm import tqdm
 from transformers import AutoModel, AutoTokenizer, AutoModelForSequenceClassification
 from datetime import datetime
@@ -183,8 +183,8 @@ def test_shapley(checkpoint, loader, suffix):
 
 
 checkpoints = [
-    ("crows_pairs_bert_classifieronly", load_processed_crows_pairs),
-    ("crows_pairs_bert_finetuned", load_processed_crows_pairs),
+    ("winobias_bert_classifieronly", load_processed_winobias),
+    ("winobias_bert_finetuned", load_processed_winobias),
 ]
 
 suffixes = [
