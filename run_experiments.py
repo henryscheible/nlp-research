@@ -26,10 +26,14 @@ def launch_experiments(experiments, context_urls):
                 tag=experiment["name"]
             )
         else:
+            buildargs = dict()
+            buildargs["GPU_CARD"] = str(experiment["card"])
+            buildargs["TOKEN"] = token
             print("Building image...")
             print(f"Image path: ./experiments/{experiment['image']}")
             image, _ = client.images.build(
                 path=f"./experiments/{experiment['image']}",
+                buildargs=buildargs,
                 tag=experiment["name"]
             )
         print("Launching container...")

@@ -1,27 +1,95 @@
 {
   "contexts": {
-    "dsail": "ssh://henry@dsail2.cs.dartmouth.edu",
+    "dsail2": "ssh://henry@dsail2.cs.dartmouth.edu",
     "dsail3": "ssh://henry@dsail3.cs.dartmouth.edu"
   },
   "experiments": [
     {
       "name": "winobias-classifieronly-shapley",
-      "image": "winobias_shapley",
-      "context": "dsail",
+      "image": "shapley",
+      "context": "dsail2",
       "card": 1,
       "buildargs": {
-        "NUM_SAMPLES": 250,
-        "FINETUNE": false
+        "CHECKPOINT": "winobias_bert_classifieronly",
+        "DATASET": "winobias",
+        "NUM_SAMPLES": 250
       }
     },
     {
       "name": "winobias-finetuned-shapley",
-      "image": "winobias_shapley",
-      "context": "dsail",
-      "card": 3,
+      "image": "shapley",
+      "context": "dsail3",
+      "card": 0,
       "buildargs": {
-        "NUM_SAMPLES": 250,
-        "FINETUNE": true
+        "CHECKPOINT": "winobias_bert_finetuned",
+        "DATASET": "winobias",
+        "NUM_SAMPLES": 250
+      }
+    },
+    {
+      "name": "stereoset-classifieronly-shapley",
+      "image": "shapley",
+      "context": "dsail2",
+      "card": 1,
+      "buildargs": {
+        "CHECKPOINT": "stereoset_bert_classifieronly",
+        "DATASET": "stereoset",
+        "NUM_SAMPLES": 250
+      }
+    },
+    {
+      "name": "stereoset-finetuned-shapley",
+      "image": "shapley",
+      "context": "dsail3",
+      "card": 0,
+      "buildargs": {
+        "CHECKPOINT": "stereoset_bert_finetuned",
+        "DATASET": "stereoset",
+        "NUM_SAMPLES": 250
+      }
+    },
+    {
+      "name": "stereoset-classifieronly-shapley",
+      "image": "shapley",
+      "context": "dsail2",
+      "card": 1,
+      "buildargs": {
+        "CHECKPOINT": "stereoset_binary_bert_classifieronly",
+        "DATASET": "stereoset",
+        "NUM_SAMPLES": 250
+      }
+    },
+    {
+      "name": "stereoset-finetuned-shapley",
+      "image": "shapley",
+      "context": "dsail3",
+      "card": 0,
+      "buildargs": {
+        "CHECKPOINT": "stereoset_binary_bert_finetuned",
+        "DATASET": "stereoset",
+        "NUM_SAMPLES": 250
+      }
+    },
+    {
+      "name": "crowspairs-classifieronly-shapley",
+      "image": "shapley",
+      "context": "dsail2",
+      "card": 1,
+      "buildargs": {
+        "CHECKPOINT": "crows_pairs_bert_classifieronly",
+        "DATASET": "crows_pairs",
+        "NUM_SAMPLES": 250
+      }
+    },
+    {
+      "name": "crowspairs-finetuned-shapley",
+      "image": "shapley",
+      "context": "dsail3",
+      "card": 0,
+      "buildargs": {
+        "CHECKPOINT": "crows_pairs_bert_finetuned",
+        "DATASET": "crows_pairs",
+        "NUM_SAMPLES": 250
       }
     }
   ]

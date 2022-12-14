@@ -1,0 +1,14 @@
+{
+  "contexts": {
+    "dsail": "ssh://henry@dsail2.cs.dartmouth.edu",
+    "dsail3": "ssh://henry@dsail3.cs.dartmouth.edu"
+  },
+  "experiments": [
+    {
+      "name": "cross_dataset_ablation",
+      "image": "cross_dataset_ablation",
+      "context": "dsail",
+      "card": 1
+    }
+  ]
+}

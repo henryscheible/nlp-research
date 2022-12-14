@@ -1,0 +1,30 @@
+{
+  "contexts": {
+    "dsail": "ssh://henry@dsail2.cs.dartmouth.edu",
+    "dsail3": "ssh://henry@dsail3.cs.dartmouth.edu"
+  },
+  "experiments": [
+    {
+      "name": "winobias-classifieronly-output-shapley",
+      "image": "output_shapley",
+      "context": "dsail",
+      "card": 1,
+      "buildargs": {
+        "CHECKPOINT": "winobias_bert_classifieronly",
+        "DATASET": "winobias",
+        "NUM_SAMPLES": 10
+      }
+    },
+    {
+      "name": "winobias-finetuned-output-shapley",
+      "image": "output_shapley",
+      "context": "dsail3",
+      "card": 0,
+      "buildargs": {
+        "CHECKPOINT": "winobias_bert_finetuned",
+        "DATASET": "winobias",
+        "NUM_SAMPLES": 10
+      }
+    }
+  ]
+}
