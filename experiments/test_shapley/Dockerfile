@@ -1,4 +1,4 @@
-FROM nlpcore-local:latest
+FROM nlpcore:latest
 ARG TOKEN
 RUN pip install pandas
 RUN python3 -c "from huggingface_hub import HfFolder; HfFolder.save_token('$TOKEN')"

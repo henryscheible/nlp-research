@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-docker_context="dsail"
+docker_context="dsail3"
 docker context use $docker_context
 while read p; do
   echo "===============STARTING CONTAINER $p==============="
