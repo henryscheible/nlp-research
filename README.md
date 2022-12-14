@@ -4,7 +4,7 @@ This repository consists of an assortment of natural language processing experim
 It also contains a containerization system for quickly starting and monitoring multiple experiments at the same time as well as ensuring experiment reproducibility
 
 ## Experiments
-Each experiment is a directory in `experiments` consisting of a Dockerfile, possibly with additional python scripts. To run the experiment, the docker image is built. This setup is extremely versatile because an experiment can extend another experiment by using the parent experiment as the starting point for building the docker image. Thus, some experiments images are extremely lightweight, merely modifiying a few environment variables from the parent image, while some contain significant scripts
+Each experiment is a directory in `experiments` consisting of a Dockerfile, possibly with additional python scripts. To run the experiment, the docker image is built. This setup is extremely versatile because an experiment can extend another experiment by using the parent experiment as the starting point for building the docker image. Thus, some experiments images are extremely lightweight, merely modifying a few environment variables from the parent image, while some contain significant scripts
 
 All experiments are based on the `nlpcore-local` image which is built from the docker environment in [this](https://github.com/henryscheible/nlpcore) repository. This image installs essential packages like PyTorch and HuggingFace and also installs the `nlpcore` package which contains code that is shared between a significant number of experiments. By extracting common code to this package, `train.py` files in experiments can be made extremely short and clear, allowing for easy edits and less bugs.
 
