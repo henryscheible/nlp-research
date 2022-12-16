@@ -5,25 +5,69 @@
   },
   "experiments": [
     {
-      "name": "winobias-classifieronly-output-shapley",
+      "name": "winobias-classifieronly-output_shapley",
       "image": "output_shapley",
       "context": "dsail",
       "card": 1,
       "buildargs": {
         "CHECKPOINT": "winobias_bert_classifieronly",
         "DATASET": "winobias",
-        "NUM_SAMPLES": 10
+        "NUM_SAMPLES": 250
       }
     },
     {
-      "name": "winobias-finetuned-output-shapley",
+      "name": "winobias-finetuned-output_shapley",
       "image": "output_shapley",
       "context": "dsail3",
       "card": 0,
       "buildargs": {
         "CHECKPOINT": "winobias_bert_finetuned",
         "DATASET": "winobias",
-        "NUM_SAMPLES": 10
+        "NUM_SAMPLES": 250
+      }
+    },
+    {
+      "name": "stereoset-classifieronly-output_shapley",
+      "image": "output_shapley",
+      "context": "dsail",
+      "card": 1,
+      "buildargs": {
+        "CHECKPOINT": "stereoset_binary_bert_classifieronly",
+        "DATASET": "stereoset",
+        "NUM_SAMPLES": 250
+      }
+    },
+    {
+      "name": "stereoset-finetuned-output_shapley",
+      "image": "output_shapley",
+      "context": "dsail3",
+      "card": 0,
+      "buildargs": {
+        "CHECKPOINT": "stereoset_binary_bert_finetuned",
+        "DATASET": "stereoset",
+        "NUM_SAMPLES": 250
+      }
+    },
+    {
+      "name": "crowspairs-classifieronly-output_shapley",
+      "image": "output_shapley",
+      "context": "dsail",
+      "card": 1,
+      "buildargs": {
+        "CHECKPOINT": "crows_pairs_bert_classifieronly",
+        "DATASET": "crows_pairs",
+        "NUM_SAMPLES": 250
+      }
+    },
+    {
+      "name": "crowspairs-finetuned-output_shapley",
+      "image": "output_shapley",
+      "context": "dsail3",
+      "card": 0,
+      "buildargs": {
+        "CHECKPOINT": "crows_pairs_bert_finetuned",
+        "DATASET": "crows_pairs",
+        "NUM_SAMPLES": 250
       }
     }
   ]

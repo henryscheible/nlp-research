@@ -32,28 +32,6 @@
       "context": "dsail2",
       "card": 1,
       "buildargs": {
-        "CHECKPOINT": "stereoset_bert_classifieronly",
-        "DATASET": "stereoset",
-        "NUM_SAMPLES": 250
-      }
-    },
-    {
-      "name": "stereoset-finetuned-shapley",
-      "image": "shapley",
-      "context": "dsail3",
-      "card": 0,
-      "buildargs": {
-        "CHECKPOINT": "stereoset_bert_finetuned",
-        "DATASET": "stereoset",
-        "NUM_SAMPLES": 250
-      }
-    },
-    {
-      "name": "stereoset-classifieronly-shapley",
-      "image": "shapley",
-      "context": "dsail2",
-      "card": 1,
-      "buildargs": {
         "CHECKPOINT": "stereoset_binary_bert_classifieronly",
         "DATASET": "stereoset",
         "NUM_SAMPLES": 250
