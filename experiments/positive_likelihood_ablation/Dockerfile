@@ -1,12 +1,9 @@
-FROM ghcr.io/henryscheible/nlpcore:v1.0.0
+FROM ghcr.io/henryscheible/nlpcore:v1.0.3
 ARG TOKEN
+RUN pip install pandas
 RUN python3 -c "from huggingface_hub import HfFolder; HfFolder.save_token('$TOKEN')"
 RUN python -c 'from huggingface_hub import whoami; print(whoami())'
 COPY ./train.py /workspace
-ARG CHECKPOINT
-ARG DATASET
-ARG NUM_SAMPLES
-ENV CHECKPOINT=$CHECKPOINT
-ENV DATASET=$DATASET
-ENV NUM_SAMPLES=$NUM_SAMPLES
+ENV NVIDIA_VISIBLE_DEVICES=1,3
+ENV CUDA_VISIBLE_DEVICES=1,3
 CMD ["python3", "/workspace/train.py"]
