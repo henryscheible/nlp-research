@@ -168,7 +168,7 @@ def get_results():
         checkpoint_results = {}
         for suffix in suffixes:
             checkpoint_results[str(suffix)] = test_shapley(checkpoint, suffix)
-        ret[checkpoint[0]] = checkpoint_results
+        ret[checkpoint] = checkpoint_results
     return ret
 
 
