@@ -1,4 +1,5 @@
 import json
+import os
 
 import evaluate
 import numpy as np
@@ -16,12 +17,10 @@ from nlpcore.stereotypescore import StereotypeScoreCalculator
 from nlpcore.maskmodel import MaskModel
 from tqdm import tqdm
 from transformers import AutoTokenizer, AutoModelForNextSentencePrediction
-from transformers import BertTokenizer, BertForNextSentencePrediction
 import torch
-import datetime
+from datetime import datetime
 
-
-
+MODEL = os.environ.get("MODEL")
 
 def pull_contribs(checkpoint, suffix):
     res = requests.get(f"https://huggingface.co/henryscheible/{checkpoint}/raw/main/output-contribs-{suffix}.txt")
@@ -88,65 +87,89 @@ def get_top_down_masks_rev(contribs):
     return [torch.tensor(mask).reshape(12, 12).to("cuda" if torch.cuda.is_available() else "cpu") for mask in masks]
 
 
-def get_ss(inner_model, tokenizer, mask=None):
+def get_ss(calc, inner_model, mask=None):
     inner_model.eval()
     inner_model.to("cuda" if torch.cuda.is_available() else "cpu")
     mask = torch.ones((12, 12)).to("cuda" if torch.cuda.is_available() else "cpu") if mask is None else mask
-
     model = MaskModel(inner_model, mask).to("cuda" if torch.cuda.is_available() else "cpu")
-    calc = StereotypeScoreCalculator(model, tokenizer, model, tokenizer)
-    print(f"MODEL: {model}")
-    print(f"MASK: {mask}")
-
-
+    calc.set_intersentence_model(model)
     return calc()
 
 
 def test_shapley(checkpoint, suffix):
     REPO = "henryscheible/" + checkpoint
     print(f"=======CHECKPOINT: {checkpoint}==========")
-    tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
-    model = BertForNextSentencePrediction.from_pretrained("bert-base-uncased")
-    base_ss = get_ss(model, tokenizer)
+    tokenizer = AutoTokenizer.from_pretrained(MODEL)
+    model = AutoModelForNextSentencePrediction.from_pretrained(MODEL)
+    calc = StereotypeScoreCalculator(model, tokenizer, model, tokenizer)
+    base_ss, base_lm = get_ss(calc, model)
 
 
     contribs = pull_contribs(checkpoint, suffix)
 
+    print("CALCULATING BOTTOM_UP")
+
     progress_bar = tqdm(range(144))
 
-    bottom_up_results = []
+    bottom_up_ss = []
+    bottom_up_lm = []
     for mask in get_bottom_up_masks(contribs):
-        bottom_up_results += [get_ss(model, tokenizer, mask=mask)]
+        ss, lm = get_ss(calc, model, mask=mask)
+        bottom_up_ss += [ss]
+        bottom_up_lm += [lm]
         progress_bar.update(1)
 
-    progress_bar = tqdm(range(144))
-
-    top_down_results = []
-    for mask in get_top_down_masks(contribs):
-        top_down_results += [get_ss(model, tokenizer, mask=mask)]
-        progress_bar.update(1)
-
-    progress_bar = tqdm(range(144))
-
-    bottom_up_rev_results = []
-    for mask in get_bottom_up_masks_rev(contribs):
-        bottom_up_rev_results += [get_ss(model, tokenizer, mask=mask)]
-        progress_bar.update(1)
-
-    progress_bar = tqdm(range(144))
-
-    top_down_rev_results = []
-    for mask in get_top_down_masks_rev(contribs):
-        top_down_rev_results += [get_ss(model, tokenizer, mask=mask)]
-        progress_bar.update(1)
+    print("CALCULATING TOP_DOWN")
+    #
+    #
+    # progress_bar = tqdm(range(144))
+    #
+    # top_down_ss = []
+    # top_down_lm = []
+    # for mask in get_top_down_masks(contribs):
+    #     ss, lm = get_ss(calc, model, mask=mask)
+    #     top_down_ss += [ss]
+    #     top_down_lm += [ss]
+    #     progress_bar.update(1)
+    #
+    # print("CALCULATING BOTTOM_UP_REV")
+    #
+    # progress_bar = tqdm(range(144))
+    #
+    #
+    # bottom_up_rev_ss = []
+    # bottom_up_rev_lm = []
+    # for mask in get_bottom_up_masks_rev(contribs):
+    #     ss, lm = get_ss(calc, model, mask=mask)
+    #     bottom_up_rev_ss += [ss]
+    #     bottom_up_rev_lm += [ss]
+    #     progress_bar.update(1)
+    #
+    # print("CALCULATING TOP_DOWN_REV")
+    #
+    #
+    # progress_bar = tqdm(range(144))
+    #
+    # top_down_rev_ss = []
+    # top_down_rev_lm = []
+    # for mask in get_top_down_masks_rev(contribs):
+    #     ss, lm = get_ss(calc, model, mask=mask)
+    #     top_down_rev_ss += [ss]
+    #     top_down_rev_lm += [ss]
+    #     progress_bar.update(1)
 
     return {
-        "base_acc": base_ss,
+        "base_ss": base_ss,
+        "base_lm": base_lm,
         "contribs": contribs,
-        "bottom_up_results": list(bottom_up_results),
-        "top_down_results": list(top_down_results),
-        "bottom_up_rev_results": list(bottom_up_rev_results),
-        "top_down_rev_results": list(top_down_rev_results)
+        "bottom_up_ss": list(bottom_up_ss),
+        "bottom_up_lm": list(bottom_up_lm),
+        # "top_down_ss": list(top_down_ss),
+        # "top_down_lm": list(top_down_lm),
+        # "bottom_up_rev_ss": list(bottom_up_rev_ss),
+        # "bottom_up_rev_lm": list(bottom_up_rev_lm),
+        # "top_down_rev_ss": list(top_down_rev_ss),
+        # "top_down_rev_lm": list(top_down_rev_lm),
     }
 
 

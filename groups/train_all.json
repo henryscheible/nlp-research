@@ -5,21 +5,21 @@
   },
   "experiments": [
     {
-      "name": "ss_ablation_roberta_large",
-      "image": "ss_ablation",
+      "name": "roberta-base",
+      "image": "train_stereoset",
       "context": "dsail",
-      "card": "1",
+      "card": 1,
       "buildargs": {
-        "MODEL": "roberta-large"
+        "MODEL": "roberta-base"
       }
     },
     {
-      "name": "ss_ablation_roberta_base",
-      "image": "ss_ablation",
+      "name": "roberta-large",
+      "image": "train_stereoset",
       "context": "dsail3",
-      "card": "0",
+      "card": 0,
       "buildargs": {
-        "MODEL": "roberta-base"
+        "MODEL": "roberta-large"
       }
     }
   ]
