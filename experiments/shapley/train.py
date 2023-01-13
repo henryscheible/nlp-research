@@ -9,6 +9,7 @@ import transformers
 from captum.attr import ShapleyValueSampling
 from datasets import load_dataset, DatasetDict
 from huggingface_hub import HfApi
+from nlpcore.bias_datasets.stereoset import load_processed_stereoset
 from nlpcore.bias_datasets.winobias import load_processed_winobias
 from nlpcore.bias_datasets.crows_pairs import load_processed_crows_pairs
 from nlpcore.shapley import get_shapley
@@ -17,13 +18,11 @@ from transformers import AutoTokenizer, AutoModelForSequenceClassification, Data
 
 print(f"=======IS CUDA AVAILABLE: {torch.cuda.is_available()}==========")
 #
-# DATASET = os.environ.get("DATASET")
-# NUM_SAMPLES = int(os.environ.get("NUM_SAMPLES"))
-#
-# CHECKPOINT = os.environ.get("CHECKPOINT")
-DATASET = "stereoset"
-NUM_SAMPLES = 250
-CHECKPOINT = "stereoset_binary_roberta-base_classifieronly"
+DATASET = os.environ.get("DATASET")
+NUM_SAMPLES = int(os.environ.get("NUM_SAMPLES"))
+
+CHECKPOINT = os.environ.get("CHECKPOINT")
+
 REPO = "henryscheible/"+CHECKPOINT
 
 tokenizer = AutoTokenizer.from_pretrained(REPO)

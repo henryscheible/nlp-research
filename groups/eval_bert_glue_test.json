@@ -1,0 +1,19 @@
+{
+  "contexts": {
+    "dsail": "ssh://henry@dsail2.cs.dartmouth.edu",
+    "dsail3": "ssh://henry@dsail3.cs.dartmouth.edu",
+    "mms-large-2": "ssh://henry@mms-large-2.cs.dartmouth.edu"
+  },
+  "experiments": [
+    {
+      "name": "cola_masked",
+      "image": "glue_evaluation",
+      "context": "dsail3",
+      "card": 2,
+      "buildargs": {
+        "TASK": "cola",
+        "EPOCHS": 5
+      }
+    }
+  ]
+}

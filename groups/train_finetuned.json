@@ -1,0 +1,108 @@
+{
+  "contexts": {
+    "dsail": "ssh://henry@dsail2.cs.dartmouth.edu",
+    "dsail3": "ssh://henry@dsail3.cs.dartmouth.edu"
+  },
+  "experiments": [
+    {
+      "name": "stereoset_bert-base-uncased_finetuned",
+      "image": "train",
+      "context": "dsail",
+      "card": 2,
+      "buildargs": {
+        "MODEL": "bert-base-uncased",
+        "DATASET": "stereoset",
+        "FINETUNE": "True"
+      }
+    },
+    {
+      "name": "stereoset_roberta-base_finetuned",
+      "image": "train",
+      "context": "dsail",
+      "card": 2,
+      "buildargs": {
+        "MODEL": "roberta-base",
+        "DATASET": "stereoset",
+        "FINETUNE": "True"
+
+      }
+    },
+    {
+      "name": "stereoset_roberta-large_finetuned",
+      "image": "train",
+      "context": "dsail",
+      "card": 2,
+      "buildargs": {
+        "MODEL": "roberta-large",
+        "DATASET": "stereoset",
+        "FINETUNE": "True"
+      }
+    },
+    {
+      "name": "winobias_bert-base-uncased_finetuned",
+      "image": "train",
+      "context": "dsail",
+      "card": 1,
+      "buildargs": {
+        "MODEL": "bert-base-uncased",
+        "DATASET": "winobias",
+        "FINETUNE": "True"
+      }
+    },
+    {
+      "name": "winobias_roberta-base_finetuned",
+      "image": "train",
+      "context": "dsail",
+      "card": 1,
+      "buildargs": {
+        "MODEL": "roberta-base",
+        "DATASET": "winobias",
+        "FINETUNE": "True"
+      }
+    },
+    {
+      "name": "winobias_roberta-large_finetuned",
+      "image": "train",
+      "context": "dsail",
+      "card": 1,
+      "buildargs": {
+        "MODEL": "roberta-large",
+        "DATASET": "winobias",
+        "FINETUNE": "True"
+      }
+    },
+    {
+      "name": "crowspairs_bert-base-uncased_finetuned",
+      "image": "train",
+      "context": "dsail",
+      "card": 0,
+      "buildargs": {
+        "MODEL": "bert-base-uncased",
+        "DATASET": "crowspairs",
+        "FINETUNE": "True"
+      }
+    },
+    {
+      "name": "crowspairs_roberta-base_finetuned",
+      "image": "train",
+      "context": "dsail",
+      "card": 0,
+      "buildargs": {
+        "MODEL": "roberta-base",
+        "DATASET": "crowspairs",
+        "FINETUNE": "True"
+      }
+    },
+    {
+      "name": "crowspairs_roberta-large_finetuned",
+      "image": "train",
+      "context": "dsail",
+      "card": 0,
+      "buildargs": {
+        "MODEL": "roberta-large",
+        "DATASET": "crowspairs",
+        "FINETUNE": "True"
+      }
+    }
+  ]
+}

@@ -27,7 +27,7 @@ checkpoint = f"{DATASET}_{MODEL}_{train_tag}"
 print(f"Model Configuration: INCLUDE_UNRELATED: {INCLUDE_UNRELATED}, FINETUNE: {FINETUNE}")
 print(f"Model Checkpoint Name: {checkpoint}")
 
-num_labels = 3 if INCLUDE_UNRELATED == "True" else 2
+num_labels = 2
 
 model = AutoModelForSequenceClassification.from_pretrained(MODEL, num_labels=num_labels)
 tokenizer = AutoTokenizer.from_pretrained(MODEL)
@@ -36,17 +36,18 @@ if DATASET == "stereoset":
     print(f"Downloaded Dataset: {raw_dataset}")
     dataset = process_stereoset(raw_dataset, tokenizer)
     data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
-    train = DataLoader(dataset["train"], shuffle=True, batch_size=8, collate_fn=data_collator)
+    train = DataLoader(dataset["train"], shuffle=True, batch_size=24, collate_fn=data_collator)
     eval = DataLoader(dataset["eval"], batch_size=64, collate_fn=data_collator)
 elif DATASET == "winobias":
     data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
     dataset = process_winobias(tokenizer)
-    train = DataLoader(dataset["train"], shuffle=True, batch_size=8, collate_fn=data_collator)
+    train = DataLoader(dataset["train"], shuffle=True, batch_size=24, collate_fn=data_collator)
     eval = DataLoader(dataset["eval"], batch_size=64, collate_fn=data_collator)
 elif DATASET == "crowspairs":
     raw_dataset = load_dataset("crows_pairs")['test']
+    data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
     dataset = process_crows_pairs(raw_dataset, tokenizer)
-    train = DataLoader(dataset["train"], shuffle=True, batch_size=8, collate_fn=data_collator)
+    train = DataLoader(dataset["train"], shuffle=True, batch_size=24, collate_fn=data_collator)
     eval = DataLoader(dataset["test"], batch_size=64, collate_fn=data_collator)
 
 # Create train and eval dataloaders
@@ -55,14 +56,14 @@ if "roberta" in MODEL:
     param_names = ["classifier.dense.weight", "classifier.dense.bias", "classifier.out_proj.weight", "classifier.out_proj.bias"]
 elif "bert" in MODEL:
     param_names = ["classifier.weight", "classifier.bias"]
-
-params = model.parameters() if FINETUNE else [param_dict[name] for name in param_names]
+print(f"PARAM NAMES: {param_names}")
+params = model.parameters() if FINETUNE == "True" else [param_dict[name] for name in param_names]
 best_model, validation = train_model(
     model,
     params,
     train,
     eval,
-    epochs=10,
+    epochs=12,
 )
 api = HfApi()
 try:

@@ -1,0 +1,99 @@
+{
+  "contexts": {
+    "dsail": "ssh://henry@dsail2.cs.dartmouth.edu",
+    "dsail3": "ssh://henry@dsail3.cs.dartmouth.edu",
+    "mms-large-2": "ssh://henry@mms-large-2.cs.dartmouth.edu"
+  },
+  "experiments": [
+    {
+      "name": "cola_masked",
+      "image": "glue_evaluation",
+      "context": "dsail3",
+      "card": 2,
+      "buildargs": {
+        "TASK": "cola",
+        "EPOCHS": 5
+      }
+    },
+    {
+      "name": "sst2_masked",
+      "image": "glue_evaluation",
+      "context": "dsail3",
+      "card": 0,
+      "buildargs": {
+        "TASK": "sst2",
+        "EPOCHS": 5
+      }
+    },
+    {
+      "name": "mrpc_masked",
+      "image": "glue_evaluation",
+      "context": "dsail3",
+      "card": 2,
+      "buildargs": {
+        "TASK": "mrpc",
+        "EPOCHS": 5
+      }
+    },
+    {
+      "name": "stsb_masked",
+      "image": "glue_evaluation",
+      "context": "dsail3",
+      "card": 3,
+      "buildargs": {
+        "TASK": "stsb",
+        "EPOCHS": 5
+      }
+    },
+    {
+      "name": "qqp_masked",
+      "image": "glue_evaluation",
+      "context": "mms-large-2",
+      "card": 0,
+      "buildargs": {
+        "TASK": "qqp",
+        "EPOCHS": 5
+      }
+    },
+    {
+      "name": "mnli_masked",
+      "image": "glue_evaluation",
+      "context": "mms-large-2",
+      "card": 3,
+      "buildargs": {
+        "TASK": "mnli",
+        "EPOCHS": 5
+      }
+    },
+    {
+      "name": "qnli_masked",
+      "image": "glue_evaluation",
+      "context": "dsail3",
+      "card": 3,
+      "buildargs": {
+        "TASK": "qnli",
+        "EPOCHS": 5
+      }
+    },
+    {
+      "name": "rte_masked",
+      "image": "glue_evaluation",
+      "context": "dsail3",
+      "card": 3,
+      "buildargs": {
+        "TASK": "rte",
+        "EPOCHS": 5
+      }
+    },
+    {
+      "name": "wnli_masked",
+      "image": "glue_evaluation",
+      "context": "dsail3",
+      "card": 2,
+      "buildargs": {
+        "TASK": "wnli",
+        "EPOCHS": 5
+      }
+    }
+  ]
+}

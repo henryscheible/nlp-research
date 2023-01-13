@@ -60,7 +60,7 @@ def monitor_experiments(experiments, context_urls):
         client = contexts[experiment["context"]]
         try:
             container = client.containers.get(experiment["name"])
-            print(f"{experiment['name']:<30} | {container.logs(tail=1)}")
+            print(f"\033[94m \033[1m{experiment['name']:<20} \033[0m{experiment['context']:<12}  {container.status:<10} | {str(container.logs(tail=1))[:100]}")
         except docker.errors.NotFound:
             print(f"Container \"{experiment['name']}\" does not exist")
 

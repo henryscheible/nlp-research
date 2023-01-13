@@ -184,14 +184,10 @@ def test_shapley(eval_checkpoint, eval_loader_func, contrib_checkpoint, suffix):
 #         repo_type="model",
 #     )
 
-shapley_checkpoint = "stereoset_binary_bert_classifieronly"
-
 eval_checkpoints = [
-    ("stereoset_binary_bert_finetuned", load_processed_stereoset),
     ("winobias_bert_classifieronly", load_processed_winobias),
-    ("winobias_bert_finetuned", load_processed_winobias),
     ("crows_pairs_bert_classifieronly", load_processed_crows_pairs),
-    ("crows_pairs_bert_finetuned", load_processed_crows_pairs),
+    ("stereoset_binary_bert_classifieronly", load_processed_stereoset)
 ]
 
 suffixes = [
@@ -205,10 +201,12 @@ suffixes = [
 def get_results():
     ret = dict()
     for checkpoint in eval_checkpoints:
-        checkpoint_results = {}
-        for suffix in suffixes:
-            checkpoint_results[str(suffix)] = test_shapley(*checkpoint, shapley_checkpoint, suffix)
-        ret[checkpoint[0]] = checkpoint_results
+        ret[checkpoint[0]] = dict()
+        for shapley_checkpoint in eval_checkpoints:
+            checkpoint_results = {}
+            for suffix in suffixes:
+                checkpoint_results[str(suffix)] = test_shapley(*checkpoint, shapley_checkpoint[0], suffix)
+            ret[checkpoint[0]][shapley_checkpoint[0]] = checkpoint_results
     return ret
 
 
@@ -223,7 +221,7 @@ time = datetime.now()
 api = HfApi()
 api.upload_file(
     path_or_fileobj="results.json",
-    path_in_repo=f"results_{time}.json",
+    path_in_repo=f"results_cross_dataset_ablation_{time}.json",
     repo_id=f"henryscheible/experiment_results",
     repo_type="model",
 )

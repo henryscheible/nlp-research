@@ -6,7 +6,9 @@ import pandas as pd
 import requests
 import torch
 from huggingface_hub import HfApi
+from nlpcore.bias_datasets.crows_pairs import load_processed_crows_pairs
 from nlpcore.bias_datasets.winobias import load_processed_winobias
+from nlpcore.bias_datasets.stereoset import load_processed_stereoset
 from tqdm import tqdm
 from transformers import AutoModel, AutoTokenizer, AutoModelForSequenceClassification
 from datetime import datetime
@@ -14,7 +16,8 @@ import matplotlib.pyplot as plt
 
 
 def pull_contribs(checkpoint, suffix):
-    res = requests.get(f"https://huggingface.co/henryscheible/{checkpoint}/raw/main/output-contribs-{suffix}.txt")
+    res = requests.get(f"https://huggingface.co/henryscheible/{checkpoint}/raw/main/contribs-{suffix}.txt")
+    print(f"https://huggingface.co/henryscheible/{checkpoint}/raw/main/contribs-{suffix}.txt")
     print(res.text)
     return json.loads(res.text)
 
@@ -183,14 +186,16 @@ def test_shapley(checkpoint, loader, suffix):
 
 
 checkpoints = [
+    ("stereoset_binary_bert_classifieronly", load_processed_stereoset),
+    ("stereoset_binary_bert_finetuned", load_processed_stereoset),
     ("winobias_bert_classifieronly", load_processed_winobias),
+    ("winobias_bert_finetuned", load_processed_winobias),
+    ("crows_pairs_bert_classifieronly", load_processed_crows_pairs),
+    ("crows_pairs_bert_finetuned", load_processed_crows_pairs),
 ]
 
 suffixes = [
-    "10",
-    # "750",
-    # "500",
-    # "1000"
+    "250",
 ]
 
 
